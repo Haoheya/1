@@ -19,5 +19,5 @@ possibility of direct language translations in audio form. Although the final re
 have inconsistencies and are not as efficient as the traditional speech to speech translation
 techniques which heavily rely on text translations, they serve as a promising
 platform for further research.
-#######Keywords: Encoder-Decoder, Sequence to Sequence Modelling, LSTM Neural
+######Keywords: Encoder-Decoder, Sequence to Sequence Modelling, LSTM Neural
 Networks
