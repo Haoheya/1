@@ -37,3 +37,6 @@ Note : The project also uses another online source for dataset - https://www.101
 2. After the corpus has been broken in text files containing single sentences, use TTSWavenet.py to synthesize it into speech. Please note that for this step you will have to create a project in Google Cloud (GCP). The coversions are free of cost as of 28th June 2021.
 3. In this step we create a 3D matrix of the spectrogram for both the datasets using 'GenerateData.py'. For this to work kindly change "C:\src\Thesis\Data\Tat\Speech\Test\Eng\En" to the location where you synthesized the utterance pairs in the previous step. The 3D matrices will be stored as '.pckl' files for both Eng and Swe.
 4. Now you use any (or all) of the three models by loading the '.pckl' file and run the code. All the three models should generate the predicted audio for the first training Swedish utterance at the end.
+
+Tips:
+To run the training model, one can use Kaggle Kernel that provides free powerful GPU.
