@@ -62,6 +62,8 @@ model.fit(train, target,
 #Save Model Weights
 model.save('s2sI.h5')
 
+#Prediction model for training samples
+y_predS = model.predict(train)
 
 #Predicted 1st Sample Audio
 start = time.time()
