@@ -28,12 +28,12 @@ maxS = np.zeros(samples + 1)
 start = time.time()
 while(d<(samples + 1)):
     
-    yE, srE = librosa.load("\content\drive\MyDrive\S2S Parallel data\zh\di"+str(d)+"ju.wav")
+    yE, srE = librosa.load("/content/drive/MyDrive/S2S Parallel data/zh/di"+str(d)+"ju.wav")
     Se = librosa.feature.melspectrogram(y=yE, sr=srE, n_mels=128,fmax=srE/2)
     colE = Se.shape[1]
     maxE[d-1] = colE
 
-    yS, srS = librosa.load("\content\drive\MyDrive\S2S Parallel data\tibet\di"+str(d)+"ju.wav")
+    yS, srS = librosa.load("/content/drive/MyDrive/S2S Parallel data/tibet/di"+str(d)+"ju.wav")
     Ss = librosa.feature.melspectrogram(y=yS, sr=srS, n_mels=128,fmax=srS/2)
     colS = Ss.shape[1]
     maxS[d-1] = colS
