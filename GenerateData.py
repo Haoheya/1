@@ -12,17 +12,18 @@ Created on Wed Mar 10 14:28:27 2021
 import time
 import warnings
 import numpy as np
+import librosa
 warnings.filterwarnings("ignore")
 
 d = 1
 flag = 1
 count = 0
-samples = 1500
+samples = 1500 #有多少语音对这里就是多少
 
-En = np.zeros((samples,128,200))
+En = np.zeros((samples,128,500))
 maxE = np.zeros(samples + 1)
 
-Sv = np.zeros((samples,128,200))
+Sv = np.zeros((samples,128,500))
 maxS = np.zeros(samples + 1)
 
 start = time.time()
@@ -41,7 +42,7 @@ while(d<(samples + 1)):
     #Ignoring all speech files that take more than 200 timesteps (to filter out long sentences)
     #Break loop for current iteration and start over with new d value.
     
-    if(colE >= 100 or colS >= 100):
+    if(colE >= 500 or colS >= 500):
         count = count + 1
         d = d+1
         continue
@@ -67,8 +68,8 @@ while(d<(samples + 1)):
 #为剩余值创建新变量
 
 Res = samples - count
-en = np.zeros((Res,128,200))
-sv = np.zeros((Res,128,200))
+en = np.zeros((Res,128,500))
+sv = np.zeros((Res,128,500))
 en = En[0:Res]
 sv = Sv[0:Res]
     
@@ -77,11 +78,11 @@ print(end - start)
 
 #转换数据以获得LSTM所需的格式
 
-S = np.zeros((Res,200,128))
+S = np.zeros((Res,500,128))
 for i in range(0,Res):
     #row = s.shape[2]
     S[i] = sv[i].T 
-E = np.zeros((Res,200,128))
+E = np.zeros((Res,500,128))
 for j in range(0,Res):
     E[j] = en[j].T
 
@@ -92,11 +93,11 @@ print('Total Data obtained : ' + str(Res))
 import pickle
 import time
 start = time.time()
-k = open('Eng'+str(Res)+'.pckl', 'wb')
+k = open('Zh'+str(Res)+'.pckl', 'wb')
 pickle.dump(E, k,protocol = 4)
 k.close()
 
-r = open('Swe'+str(Res)+'.pckl', 'wb')
+r = open('Tibet'+str(Res)+'.pckl', 'wb')
 pickle.dump(S, r,protocol = 4)
 r.close()
 
