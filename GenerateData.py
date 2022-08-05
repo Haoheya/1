@@ -6,8 +6,8 @@ Created on Wed Mar 10 14:28:27 2021
 @author: limbu
 """
 
-#Creating 3d array matrix for English and Swedish Audio clips Using Log and MinMax Scaling
-#3.12 hrs taken for 50000 files
+#使用Log和MinMax缩放为英语和瑞典语音频片段创建3d阵列矩阵
+#50000个文件需要3.12小时
 
 import time
 import warnings
@@ -28,12 +28,12 @@ maxS = np.zeros(samples + 1)
 start = time.time()
 while(d<(samples + 1)):
     
-    yE, srE = librosa.load("C:\src\Thesis\Data\Tat\Speech\Test\Eng\En"+str(d)+".mp3")
+    yE, srE = librosa.load("\content\drive\MyDrive\S2S Parallel data\zh\di"+str(d)+"ju.wav")
     Se = librosa.feature.melspectrogram(y=yE, sr=srE, n_mels=128,fmax=srE/2)
     colE = Se.shape[1]
     maxE[d-1] = colE
 
-    yS, srS = librosa.load("C:\src\Thesis\Data\Tat\Speech\Test\Swe\Swe"+str(d)+".mp3")
+    yS, srS = librosa.load("\content\drive\MyDrive\S2S Parallel data\tibet\di"+str(d)+"ju.wav")
     Ss = librosa.feature.melspectrogram(y=yS, sr=srS, n_mels=128,fmax=srS/2)
     colS = Ss.shape[1]
     maxS[d-1] = colS
@@ -64,7 +64,7 @@ while(d<(samples + 1)):
         d = d+1
         flag = flag+1
         
-#Make new variables for the remaining values
+#为剩余值创建新变量
 
 Res = samples - count
 en = np.zeros((Res,128,200))
@@ -75,7 +75,7 @@ sv = Sv[0:Res]
 end = time.time()
 print(end - start)
 
-#Transpose data to get the format required for LSTMs
+#转换数据以获得LSTM所需的格式
 
 S = np.zeros((Res,200,128))
 for i in range(0,Res):
@@ -88,7 +88,7 @@ for j in range(0,Res):
 print('Total Data obtained : ' + str(Res))
 
 
-#Save data as pickle to run calcuations in Kaggle Kernel or Google Cloud GPU
+#将数据另存为pickle，以便在Kaggle内核或Google Cloud GPU中运行计算
 import pickle
 import time
 start = time.time()
