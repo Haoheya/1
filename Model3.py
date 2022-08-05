@@ -3,7 +3,6 @@
 """
 Created on Wed Mar 10 14:32:17 2021
 
-@author: limbu
 """
 
 #Model 3 : Introduction of BiDirectional LSTM + extra Decoder LSTM + MultiHead Attention
@@ -11,10 +10,11 @@ Created on Wed Mar 10 14:32:17 2021
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout, LSTM, Bidirectional, RepeatVector, Input, Concatenate, TimeDistributed
 from tensorflow.keras import layers
+from keras.layers import MultiHeadAttention
 import pickle
 
-Eng_Pickle = 'Eng.pckl'                                #Load English .pckl file
-Swe_Pickle = 'Swe.pckl'                                #Load Swedish .pckl file
+Eng_Pickle = 'Zh97.pckl'                                #Load English .pckl file
+Swe_Pickle = 'Tibet97.pckl'                                #Load Swedish .pckl file
 
 f = open(Eng_Pickle, 'rb')
 train = pickle.load(f)
@@ -23,17 +23,19 @@ g = open(Swe_Pickle, 'rb')
 target = pickle.load(g)
 g.close()
 
-timesteps = 200
+timesteps = 500
 features = 128
 latent_dim = 128
+
+dropout_rate = 0.2
 
 inputs = Input(shape=(timesteps, features))
 
 #Initial state and cell state of the final BLSTM layer as initial states to Decoder(Done)
 
 #Encoder
-masked_encoder_inputs = layers.Masking(inputs)
-encoder_dropout = (TimeDistributed(Dropout(rate = dropout_rateE)))(masked_encoder_inputs)
+masked_encoder_inputs = layers.Masking(mask_value = 0.0)(inputs)
+encoder_dropout = (TimeDistributed(Dropout(rate = dropout_rate)))(masked_encoder_inputs)
 
 encoder_out1,f_h1, f_c1, b_h1, b_c1 = Bidirectional(LSTM(latent_dim, return_sequences = True,return_state=True))(encoder_dropout)
 
@@ -46,19 +48,19 @@ state_c3 = Concatenate()([f_c3, b_c3])
 encoder_states = [state_h3, state_c3]
 
 #Multi-Head Attention
-att_out = MultiHeadAttention(head_num=4)(encoder_out3)
+att_out = MultiHeadAttention(num_heads=4, key_dim=128)(encoder_out3,encoder_out2)
 
 #Decoder
 decoder_input1 = (att_out)
 decoder_lstm1 = LSTM(latent_dim*2, return_state=True,return_sequences=True)
-decoder_dropout1 = (TimeDistributed(Dropout(rate = dropout_rateD)))(decoder_input1)
+decoder_dropout1 = (TimeDistributed(Dropout(rate = dropout_rate)))(decoder_input1)
 decoder_out1, dec_h, dec_c = decoder_lstm1(decoder_dropout1, initial_state = encoder_states)
 
 decoder_states = [dec_h,dec_c]
 
 decoder_input2 = (decoder_out1)
 decoder_lstm2 = LSTM(latent_dim*2, return_state=True,return_sequences=True)
-decoder_dropout2 = (TimeDistributed(Dropout(rate = dropout_rateD)))(decoder_input2)
+decoder_dropout2 = (TimeDistributed(Dropout(rate = dropout_rate)))(decoder_input2)
 decoder_out2, _, _ = decoder_lstm2(decoder_dropout2, initial_state = decoder_states)
 
 decoder_outputs = TimeDistributed(Dense(features, activation='relu'))(decoder_out2)
@@ -66,7 +68,7 @@ decoder_outputs = TimeDistributed(Dense(features, activation='relu'))(decoder_ou
 model = Model(inputs, decoder_outputs)
 
 #Plot Model FlowChart
-from keras.utils import plot_model
+from tensorflow.keras.utils import plot_model
 plot_model(model, to_file='model3.png', show_shapes=True, show_layer_names=True)
 
 # Compile Model
@@ -81,18 +83,4 @@ model.fit(train, target,
 #Save Model Weights
 model.save('s2sIII.h5')
 
-#Prediction model for training samples
-y_predS = model.predict(train)
 
-#Predicted 1st Sample Audio
-start = time.time()
-print("Timing starts now")
-mel = np.abs(np.exp(y_predS[0].T))
-res = librosa.feature.inverse.mel_to_audio(mel)
-res = (np.iinfo(np.int32).max * (res/np.abs(res).max())).astype(np.int32)
-end = time.time() 
-print(end - start)
-
-#Output Predicted Audio
-import IPython.display as ipd
-ipd.Audio(res,rate = sr)
